@@ -1,0 +1,16 @@
+﻿syntax: regexp
+
+^\.tmp
+^\.project
+^\.pydevproject
+.pyc$
+^\.settings
+relre:.old$
+relre:~$
+relre:log$
+relre:.orig$
+relre:~[0-9]+
+relre:.idea$
+relre:^src/env/
+syntax: glob
+
