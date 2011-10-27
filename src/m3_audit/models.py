@@ -10,10 +10,12 @@ Created on 17.12.2010
 from django.db import models
 from django.core import serializers
 from django.contrib.auth.models import User, AnonymousUser
+
+from m3.db import BaseObjectModel
 from manager import AuditManager
 
 
-class BaseAuditModel(models.Model):
+class BaseAuditModel(BaseObjectModel):
     '''
     Базовая модель, от которой наследуются все 
     модели хранения результатов аудита
@@ -44,7 +46,7 @@ class BaseAuditModel(models.Model):
     # серверный таймстамп на запись аудита
     created = models.DateTimeField(auto_now_add=True, db_index=True, 
                                 verbose_name=u'Дата создания')
-    
+
     class Meta:
         abstract = True
         
@@ -141,6 +143,7 @@ class DictChangesAuditModel(BaseModelChangeAuditModel):
     '''
     
     class Meta:
+        verbose_name = u'Изменения в справочниках'
         db_table = 'm3_audit_dict_changes'
 
 AuditManager().register('dict-changes', DictChangesAuditModel) 
@@ -172,6 +175,7 @@ class AuthAuditModel(BaseAuditModel):
         audit.save()
     
     class Meta:
+        verbose_name = u'Авторизации пользователей'
         db_table = 'm3_audit_auth'
 
 AuditManager().register('auth', AuthAuditModel)
