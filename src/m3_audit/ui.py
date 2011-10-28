@@ -39,7 +39,7 @@ class AuditListWindow(windows.ExtWindow):
         self.grid_rows = panels.ExtObjectGrid()
         self.grid_rows.sm = containers.ExtGridRowSelModel(single_select=True)
         self.grid_rows.store.remote_sort = True
-        self.grid_rows.handler_click = 'rowClickHandler'
+        self.grid_rows.handler_click = 'rowChangeHandler'
 
         self.panel_center.items.append(self.grid_rows)
         self.items.extend([self.panel_center,])
@@ -86,7 +86,7 @@ class DefaultEastPanel(panels.ExtPanel):
         
         self.init_component(*args, **kwargs)
 
-    def create_fields(self, model, list_fields=[]):
+    def create_fields(self, model):
         '''
         Добавляет поля для просмотра записи на основе полей в модели
         '''
@@ -96,10 +96,12 @@ class DefaultEastPanel(panels.ExtPanel):
         default_field = fields.ExtStringField
         mapper[form_fields.IntegerField] = fields.ExtNumberField
         mapper[form_fields.Textarea] = fields.ExtTextArea
-        
-        fields_list = fields_for_model(model()).items()
-        for key, field in fields_list:
-            # если указан list_fields, то исключим поля, ктр в нем нет
+
+        # TODO: учитывать порядок полей в list_fields
+        list_fields = model.list_fields
+        all_fields = fields_for_model(model()).items()
+        for key, field in all_fields:
+            # если в модели указан list_fields, то исключим поля, ктр в нем нет
             if list_fields and key not in list_fields:
                 continue
             
@@ -129,9 +131,9 @@ class DefaultTopPanel(containers.ExtContainer):
 
         self.init_component(*args, **kwargs)
     
-    def create_audits_combo(self, current_audit='', list_audits=[]):
+    def create_audits_combo(self, list_audits, current_audit=''):
         '''
-        Создает комбо и формирует спиок аудитов для представления в нем
+        Создает комбо со списком аудитов для перехода между ними
         '''
         f_audits_combo = fields.ExtComboBox()
         f_audits_combo.name = 'audit_id'
@@ -144,14 +146,6 @@ class DefaultTopPanel(containers.ExtContainer):
         f_audits_combo.editable = False
         f_audits_combo.allow_blank = False
         f_audits_combo.handler_select = 'changeAuditHandler'
-
-        # TODO: эту часть можно вынести в базовый экшнпак
-        all_audits = AuditManager().list().items()
-        row = lambda code, model: (code[0], model.get_verbose_name())
-        result = [row(code, model) for code, model in all_audits]
-        if list_audits:
-            result = [x for x in result if x[0] in list_audits]
-        
-        f_audits_combo.set_store(store.ExtDataStore(data=result))
+        f_audits_combo.set_store(store.ExtDataStore(data=list_audits))
 
         self.items.append(f_audits_combo)

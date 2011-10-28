@@ -11,6 +11,7 @@ from m3.ui import actions
 import ui
 from manager import AuditManager
 
+
 class BaseAuditUIActions(actions.ActionPack):
     '''
     Базовый пакет действий, который позволяет
@@ -20,18 +21,7 @@ class BaseAuditUIActions(actions.ActionPack):
     acd = []
 
     # список отображаемых аудитов в комбо. По умолчанию - все
-    list_audits = []
-
-    # список отображаемых колонок (формат - как в диктах)
-    list_columns = [
-        ('username', u'Пользователь'),
-        ('user_info', u'Доп. инфо'),
-        ('created', u'Дата'),
-    ]
-
-    # список отображаемых полей в детализации.
-    # По умолчанию - все из модели аудита
-    list_fields = []
+    list_audits = AuditManager().list()
     
     def __init__(self):
         super(BaseAuditUIActions, self).__init__()
@@ -45,7 +35,7 @@ class BaseAuditUIActions(actions.ActionPack):
                              self.list_window_action,
                              self.fields_action,
                              ])
-    
+
     def get_acd(self):
         '''
         Возвращает context declaration на основе данных, прописанных
@@ -99,7 +89,7 @@ class BaseAuditUIActions(actions.ActionPack):
         '''
         panel = ui.DefaultEastPanel()
         model = AuditManager().get(context.audit)
-        panel.create_fields(model, self.list_fields)
+        panel.create_fields(model)
         window.url_audit_row = self.get_row_fields_url()
         window.form_details = panel.form
 
@@ -110,18 +100,17 @@ class BaseAuditUIActions(actions.ActionPack):
         Возвращает панель с опциональным списком для выбора аудита (list_audit)
         '''
         panel = ui.DefaultTopPanel()
-        panel.create_audits_combo(context.audit, self.list_audits)
+
+        # формируем список аудитов для комбо
+        audits = []
+        for audit in self.list_audits:
+            model = AuditManager().get(audit)
+            audits.append((audit, model.get_verbose_name()))
+
+        panel.create_audits_combo(audits, context.audit)
         window.url_audit_win = self.get_list_url()
 
         return panel
-
-    def get_audits_config(self):
-        """
-        Собирает все экшенпаки аудитов в системе
-        для использования их конфига list_columns и list_fields
-        ЩИТО?
-        """
-        pass
 
     def get_rows(self, pre_query, request, context):
         '''
@@ -146,17 +135,15 @@ class BaseAuditListWindowAction(actions.Action):
 
     def run(self, request, context):
         if not context.audit:
-            # FIXME: какая-то нездоровая хуйня - достаем первый попавшийся аудит
-            if self.parent.list_audits:
-                context.audit = self.parent.list_audits[0]
-            else:
-                context.audit = AuditManager().list().keys()[0][0]
+            # По умолчанию откроем первый попавшийся аудит
+            context.audit = self.parent.list_audits[0]
 
         window = ui.AuditListWindow()
         window = self.parent.get_list_window(window, request, context)
-        
+
+        model = AuditManager().get(context.audit)
+        window.create_columns(model.list_columns)
         window.grid_rows.url_data = self.parent.get_rows_url()
-        window.create_columns(self.parent.list_columns)
         window = self.parent.configure_window(window, request, context)
 
         return actions.ExtUIScriptResult(data=window)
@@ -188,7 +175,7 @@ class AuditRowsDataAction(actions.Action):
         
         model = AuditManager().get(context.audit)
         pre_query = model.objects.all()
-        pre_query = utils.apply_sort_order(pre_query, self.parent.list_columns, sort_order)
+        pre_query = utils.apply_sort_order(pre_query, model.list_columns, sort_order)
 
         query = self.parent.get_rows(pre_query, request, context)
 
@@ -213,5 +200,14 @@ class AuditRowFieldsDataAction(actions.Action):
     def run(self, request, context):
         model = AuditManager().get(context.audit)
         data = model.objects.get(pk=context.id)
+
+        # получение человеческих значений для enum-полей
+        for field in data._meta.fields:
+            if field.choices:
+                for choice in field.choices:
+                    if choice[0] == getattr(data, field.name):
+                        setattr(data, field.name, choice[1])
+#                setattr(data, field.name,
+#                        filter(lambda x, y: x == getattr(data, field.name), field.choices)[0])
 
         return actions.PreJsonResult({'data': data})

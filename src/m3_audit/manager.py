@@ -48,7 +48,7 @@ class AuditManager(object):
         AuditCache().set(audit_name, audit_model)
 
     def list(self):
-        return AuditCache().data
+        return [x[0] for x in AuditCache().data]
         
     def get(self, audit_name, default=None):
         '''

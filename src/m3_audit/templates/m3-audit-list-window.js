@@ -3,7 +3,7 @@ var form_details = Ext.getCmp('{{ component.form_details.client_id }}');
 var url_audit_win = '{{ component.url_audit_win }}';
 var url_audit_row = '{{ component.url_audit_row }}';
 
-function rowClickHandler(e){
+function rowChangeHandler(e){
     win.fireEvent('auditRowClick', grid_rows);
 
     if (form_details && url_audit_row) {

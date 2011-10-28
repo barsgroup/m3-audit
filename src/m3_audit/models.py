@@ -12,6 +12,7 @@ from django.core import serializers
 from django.contrib.auth.models import User, AnonymousUser
 
 from m3.db import BaseObjectModel
+from m3.core.json import json_encode
 from manager import AuditManager
 
 
@@ -24,28 +25,37 @@ class BaseAuditModel(BaseObjectModel):
     # данные пользователя. специально не делается ForeignKey.
     # чтобы не быть завязанными на ссылочную целостность
     # * логин пользователя в системе (на момент записи значения
-    username = models.CharField(max_length=50, null=True, blank=True, 
-                                db_index=True, default=u'', 
-                                verbose_name=u'Логин пользователя')
+    username = models.CharField(u'Логин пользователя', max_length=50, null=True, blank=True,
+                                db_index=True, default=u'')
     
     # * идентификатор пользователя
-    userid = models.PositiveIntegerField(default=0, db_index=True,
-                                    verbose_name=u'Идентификатор пользователя')
+    userid = models.PositiveIntegerField(u'Идентификатор пользователя',
+                                         default=0, db_index=True)
 
     # * ФИО пользователя на момент записи значения (для ускоренного отображения 
     #   значений
-    user_fio = models.CharField(max_length=70, null=True, blank=True, 
-                                db_index=True, default=u'',
-                                verbose_name=u'ФИО пользователя')
+    user_fio = models.CharField(u'ФИО пользователя', max_length=70, null=True, blank=True,
+                                db_index=True, default=u'')
     
     # * дополнительные сведения о пользователе (например, сотрудником какого 
     #   учреждения он являлся на момент записи
-    user_info = models.CharField(max_length=200, null=True, blank=True, default=u'',
-                                verbose_name=u'Дополнительные сведения о пользователе')
+    user_info = models.CharField(u'Дополнительные сведения о пользователе',
+                                 max_length=200, null=True, blank=True, default=u'')
     
     # серверный таймстамп на запись аудита
-    created = models.DateTimeField(auto_now_add=True, db_index=True, 
-                                verbose_name=u'Дата создания')
+    created = models.DateTimeField(u'Дата создания', auto_now_add=True, db_index=True)
+
+
+    # список отображаемых колонок (формат - как в диктах)
+    list_columns = [
+        ('username', u'Пользователь'),
+        ('user_info', u'Доп. инфо'),
+        ('created', u'Дата'),
+    ]
+
+    # список отображаемых полей в детализации.
+    # По умолчанию - все из модели аудита
+    list_fields = []
 
     class Meta:
         abstract = True
@@ -79,15 +89,27 @@ class BaseModelChangeAuditModel(BaseAuditModel):
     # Данные модели, для которой был выполнен аудит
     # * идентификатор объекта (специально не храним FK, чтобы была возможность
     #   безболезненно удалять объекты
-    object_id = models.PositiveIntegerField(default=0, db_index=True)
-    object_model = models.CharField(max_length=300, db_index=True)
-    # данные модели, на момент  
-    object_data = models.TextField()
+    object_id = models.PositiveIntegerField(u'ID записи', default=0, db_index=True)
+    object_model = models.CharField(u'Модель', max_length=300, db_index=True)
+    # данные модели, на момент записи аудита
+    object_data = models.TextField(u'Данные модели')
     
-    type = models.PositiveIntegerField(choices=((ADD, u'Добавлене'),
+    type = models.PositiveIntegerField(u'Действие', choices=((ADD, u'Добавлене'),
                                                 (EDIT, u'Изменение'),
                                                 (DELETE, u'Удаление'),),
                                        db_index=True)
+    
+    @json_encode
+    def type_ref_name(self):
+        return self.get_type_display()
+
+    list_columns = [
+        ('username', u'Пользователь'),
+        ('object_id', u'ID записи', 30),
+        ('object_model', u'Модель'),
+        ('type_ref_name', u'Действие', 70),
+        ('created', u'Дата'),
+    ]
     
     @classmethod
     def write(cls, user, model_object, type, *args, **kwargs):
@@ -131,6 +153,7 @@ class DefaultModelChangeAuditModel(BaseModelChangeAuditModel):
     '''
     
     class Meta:
+        verbose_name = u'Изменения таблиц системы'
         db_table = 'm3_audit_model_changes'
         
 AuditManager().register('model-changes', DefaultModelChangeAuditModel)        
@@ -160,10 +183,21 @@ class AuthAuditModel(BaseAuditModel):
     LOGIN = 0
     LOGOUT = 1
     
-    type = models.PositiveIntegerField(choices=((LOGIN, u'Вход в систему'),
+    type = models.PositiveIntegerField(u'Действие', choices=((LOGIN, u'Вход в систему'),
                                                 (LOGOUT, u'Выход из системы'),), 
                                        db_index=True)
-    
+
+    @json_encode
+    def type_ref_name(self):
+        return self.get_type_display()
+
+    list_columns = [
+        ('userid', u'ID', 30),
+        ('username', u'Пользователь'),
+        ('type_ref_name', u'Действие'),
+        ('created', u'Дата'),
+    ]
+
     @classmethod
     def write(cls, user, type='login', *args, **kwargs):
         '''
@@ -188,15 +222,28 @@ class RolesAuditModel(BaseAuditModel):
     PERMISSION_ENABLEMENT = 2
     PERMISSION_DISABLEMENT = 3
     
-    type = models.PositiveIntegerField(choices=((PERMISSION_ADDITION, u'Добавление прав'),
+    type = models.PositiveIntegerField(u'Действие', choices=((PERMISSION_ADDITION, u'Добавление прав'),
                                                 (PERMISSION_REMOVAL, u'Лишение прав'),
                                                 (PERMISSION_ENABLEMENT, u'Активация права'),
                                                 (PERMISSION_DISABLEMENT, u'Отключение права')
                                                 ))
-    role_id = models.PositiveIntegerField()
-    role_name = models.CharField(max_length=200)    
-    permission_code = models.CharField(max_length=200,
+    role_id = models.PositiveIntegerField(u'ID роли')
+    role_name = models.CharField(u'Роль', max_length=200)
+    permission_code = models.CharField(u'Разрешения', max_length=200,
                                         null=True, blank=True, default='')
+
+    list_columns = [
+        ('username', u'Пользователь'),
+        ('role_id', u'ID роли', 30),
+        ('role_name', u'Роль'),
+        ('type_ref_name', u'Действие', 70),
+        ('created', u'Дата'),
+    ]
+
+    @json_encode
+    def type_ref_name(self):
+        return self.get_type_display()
+
     @classmethod
     def write(cls, user, role, permission_or_code=None, type=PERMISSION_ADDITION,
                *args, **kwargs):
@@ -220,6 +267,7 @@ class RolesAuditModel(BaseAuditModel):
         permission_code = perm; return permission_code
     
     class Meta:
+        verbose_name = u'Изменения ролей пользователей'
         db_table = 'm3_audit_roles' 
         
 AuditManager().register('roles', RolesAuditModel)
