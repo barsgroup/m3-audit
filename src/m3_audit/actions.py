@@ -112,6 +112,18 @@ class BaseAuditUIActions(actions.ActionPack):
 
         return panel
 
+    def apply_column_filter(self, pre_query, request, context):
+        '''
+        Накладывает на запрос колоночный фильтр
+        '''
+        columns_map = {}
+        model = pre_query.model
+        for column in model.list_columns:
+            columns_map[column[0]] = column[0]
+            
+        pre_query = utils.apply_column_filter(pre_query, request, columns_map)
+        return pre_query
+
     def get_rows(self, pre_query, request, context):
         '''
         '''
@@ -142,7 +154,7 @@ class BaseAuditListWindowAction(actions.Action):
         window = self.parent.get_list_window(window, request, context)
 
         model = AuditManager().get(context.audit)
-        window.create_columns(model.list_columns)
+        window.create_columns(model.list_columns, model)
         window.grid_rows.url_data = self.parent.get_rows_url()
         window = self.parent.configure_window(window, request, context)
 
@@ -172,9 +184,11 @@ class AuditRowsDataAction(actions.Action):
         if direction == 'DESC':
             user_sort = '-' + user_sort
         sort_order = [user_sort] if user_sort else self.parent.list_sort_order
-        
+
         model = AuditManager().get(context.audit)
         pre_query = model.objects.all()
+
+        pre_query = self.parent.apply_column_filter(pre_query, request, context)
         pre_query = utils.apply_sort_order(pre_query, model.list_columns, sort_order)
 
         query = self.parent.get_rows(pre_query, request, context)
@@ -200,14 +214,5 @@ class AuditRowFieldsDataAction(actions.Action):
     def run(self, request, context):
         model = AuditManager().get(context.audit)
         data = model.objects.get(pk=context.id)
-
-        # получение человеческих значений для enum-полей
-        for field in data._meta.fields:
-            if field.choices:
-                for choice in field.choices:
-                    if choice[0] == getattr(data, field.name):
-                        setattr(data, field.name, choice[1])
-#                setattr(data, field.name,
-#                        filter(lambda x, y: x == getattr(data, field.name), field.choices)[0])
 
         return actions.PreJsonResult({'data': data})

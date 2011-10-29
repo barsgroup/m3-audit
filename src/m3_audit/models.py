@@ -94,20 +94,16 @@ class BaseModelChangeAuditModel(BaseAuditModel):
     # данные модели, на момент записи аудита
     object_data = models.TextField(u'Данные модели')
     
-    type = models.PositiveIntegerField(u'Действие', choices=((ADD, u'Добавлене'),
+    type = models.PositiveIntegerField(u'Действие', choices=((ADD, u'Добавление'),
                                                 (EDIT, u'Изменение'),
                                                 (DELETE, u'Удаление'),),
                                        db_index=True)
-    
-    @json_encode
-    def type_ref_name(self):
-        return self.get_type_display()
 
     list_columns = [
         ('username', u'Пользователь'),
         ('object_id', u'ID записи', 30),
         ('object_model', u'Модель'),
-        ('type_ref_name', u'Действие', 70),
+        ('type', u'Действие', 70),
         ('created', u'Дата'),
     ]
     
@@ -187,14 +183,10 @@ class AuthAuditModel(BaseAuditModel):
                                                 (LOGOUT, u'Выход из системы'),), 
                                        db_index=True)
 
-    @json_encode
-    def type_ref_name(self):
-        return self.get_type_display()
-
     list_columns = [
         ('userid', u'ID', 30),
         ('username', u'Пользователь'),
-        ('type_ref_name', u'Действие'),
+        ('type', u'Действие'),
         ('created', u'Дата'),
     ]
 
@@ -236,13 +228,9 @@ class RolesAuditModel(BaseAuditModel):
         ('username', u'Пользователь'),
         ('role_id', u'ID роли', 30),
         ('role_name', u'Роль'),
-        ('type_ref_name', u'Действие', 70),
+        ('type', u'Действие', 70),
         ('created', u'Дата'),
     ]
-
-    @json_encode
-    def type_ref_name(self):
-        return self.get_type_display()
 
     @classmethod
     def write(cls, user, role, permission_or_code=None, type=PERMISSION_ADDITION,

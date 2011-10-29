@@ -4,10 +4,6 @@ Created on 06.01.2011
 
 @author: akvarats
 '''
-
-from django.forms.models import fields_for_model
-from django import forms as form_fields
-
 from m3.ui.ext import windows
 from m3.ui.ext import panels
 from m3.ui.ext import containers
@@ -15,6 +11,7 @@ from m3.ui.ext import fields
 from m3.ui.ext.misc import store
 
 from manager import AuditManager
+from helpers import ext_fields_for_model
 
 
 class AuditListWindow(windows.ExtWindow):
@@ -40,14 +37,22 @@ class AuditListWindow(windows.ExtWindow):
         self.grid_rows.sm = containers.ExtGridRowSelModel(single_select=True)
         self.grid_rows.store.remote_sort = True
         self.grid_rows.handler_click = 'rowChangeHandler'
-
+        self.grid_rows.plugins.extend([
+            'new Ext.ux.grid.GridHeaderFilters()',
+        ])
+        
         self.panel_center.items.append(self.grid_rows)
         self.items.extend([self.panel_center,])
 
-    def create_columns(self, columns):
+    def create_columns(self, columns, model=None):
         '''
         Добавляет отображаемые колонки. Реализазация - как в диктах
         '''
+
+        # получим поля модели в виде ExtFields,
+        # чтобы сформировать подходящие хэдэр-фильтры
+        model_ext_fields = ext_fields_for_model(model)
+
         for column in columns:
             if isinstance(column, tuple):
                 column_params = { 'data_index': column[0], 'header': column[1],
@@ -58,6 +63,18 @@ class AuditListWindow(windows.ExtWindow):
                 column_params = column
             else:
                 raise Exception('Incorrect parameter column.')
+
+            if column[0] in model_ext_fields:
+                ext_field = model_ext_fields[column[0]]
+                column_params['extra'] = {
+                    'filter': ext_field.render(),
+                }
+                # для enum-колонок нечеловечески возвращаем человеческие значения
+                if hasattr(ext_field, 'store'):
+                    renderer = u'function(v){var store={%s};return store[v]}' %\
+                               ','.join('"%s":"%s"' % (key, val) for key, val in ext_field.store.data)
+                    column_params['extra']['renderer'] = renderer
+
             self.grid_rows.add_column(**column_params)
 
         
@@ -90,30 +107,22 @@ class DefaultEastPanel(panels.ExtPanel):
         '''
         Добавляет поля для просмотра записи на основе полей в модели
         '''
-        # маппер Django Forms Fields -> ExtFields
-        # TODO: использовать общий маппер (если/когда он будет)
-        mapper = dict()
-        default_field = fields.ExtStringField
-        mapper[form_fields.IntegerField] = fields.ExtNumberField
-        mapper[form_fields.Textarea] = fields.ExtTextArea
+        ext_fields = ext_fields_for_model(model)
 
-        # TODO: учитывать порядок полей в list_fields
-        list_fields = model.list_fields
-        all_fields = fields_for_model(model()).items()
-        for key, field in all_fields:
-            # если в модели указан list_fields, то исключим поля, ктр в нем нет
-            if list_fields and key not in list_fields:
-                continue
-            
-            field_cls = field.widget.__class__
-            ext_field = mapper[field_cls]() if field_cls in mapper else default_field()
+        if model.list_fields:
+            # если указаны кастомные поля для отображения, то добавляем на форму их
+            list_fields = model.list_fields
+        else:
+            # в противном случае - все поля модели
+            list_fields = ext_fields.keys()
 
-            ext_field.name = key
-            ext_field.label = field.label
-            ext_field.read_only = True
-            ext_field.anchor = '100%'
+        for field_name in list_fields:
+            if field_name in ext_fields:
+                ext_field = ext_fields[field_name]
+                ext_field.read_only = True
+                ext_field.anchor = '100%'
 
-            self.form.items.append(ext_field)
+                self.form.items.append(ext_field)
 
 
 class DefaultTopPanel(containers.ExtContainer):
