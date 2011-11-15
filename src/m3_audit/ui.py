@@ -69,7 +69,8 @@ class AuditListWindow(windows.ExtWindow):
                 column_params['extra'] = {
                     'filter': ext_field.render(),
                 }
-                # для enum-колонок нечеловечески возвращаем человеческие значения
+                # для enum-колонок сформируем рендерер, ктр будет заменять id
+                # на человеческие значения
                 if hasattr(ext_field, 'store'):
                     renderer = u'function(v){var store={%s};return store[v]}' %\
                                ','.join('"%s":"%s"' % (key, val) for key, val in ext_field.store.data)

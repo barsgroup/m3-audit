@@ -50,27 +50,6 @@ function changeAuditHandler(cml, record, recId){
 }
 
 
-// Фикс бага Ext.ComboBox, когда строки с val '' и 0 считаются идентичными:
-// заменил сравнение '==' на строгое
-// Эту штуку можно бы и выше положить, если адекватная
-// Либо есть более глобальное решение тут:
-// http://www.sencha.com/forum/showthread.php?79285
-
-Ext.override(Ext.form.ComboBox, {
-    findRecord : function(prop, value){
-        var record;
-        if(this.store.getCount() > 0){
-            this.store.each(function(r){
-                if(r.data[prop] === value){
-                    record = r;
-                    return false;
-                }
-            });
-        }
-        return record;
-    }
-});
-
 {% block extenders %}
 {# место, куда вставлять код из дочернего прикладного окошка #}
 {% endblock %}
