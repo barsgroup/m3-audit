@@ -11,6 +11,7 @@ from m3.ui import actions
 import ui
 from manager import AuditManager
 
+from datetime import datetime, time
 
 class BaseAuditUIActions(actions.ActionPack):
     '''
@@ -119,8 +120,9 @@ class BaseAuditUIActions(actions.ActionPack):
         columns_map = {}
         model = pre_query.model
         for column in model.list_columns:
-            columns_map[column[0]] = column[0]
-            
+            if column[0] != 'created':
+                columns_map[column[0]] = column[0]
+
         pre_query = utils.apply_column_filter(pre_query, request, columns_map)
         return pre_query
 
@@ -172,7 +174,8 @@ class AuditRowsDataAction(actions.Action):
         acd_list = self.parent.get_acd()
         acd_list.extend([actions.ACD(name='audit', type=str, required=True),
                          actions.ACD(name='start', type=int, required=True, default=-1),
-                         actions.ACD(name='limit', type=int, required=True, default=-1),])
+                         actions.ACD(name='limit', type=int, required=True, default=-1),
+                         actions.ACD(name='created', type=datetime)])
         return acd_list
 
     def run(self, request, context):
@@ -187,6 +190,11 @@ class AuditRowsDataAction(actions.Action):
 
         model = AuditManager().get(context.audit)
         pre_query = model.objects.all()
+
+        if request.REQUEST.get('created'):
+           end_day = datetime.combine(context.created.date(), time.max)
+           pre_query = pre_query.filter(created__gte=context.created)
+           pre_query = pre_query.filter(created__lte=end_day)
 
         pre_query = self.parent.apply_column_filter(pre_query, request, context)
         pre_query = utils.apply_sort_order(pre_query, model.list_columns, sort_order)
