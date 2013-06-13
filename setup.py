@@ -6,7 +6,7 @@ with open('src/requires.txt', 'r') as f:
     requires.extend(f.readlines())
 
 setup(name='m3-audit',
-      version='1.1',
+      version='default',
       url='https://src.bars-open.ru/py/m3/m3_contrib/m3_audit',
       license='Apache License, Version 2.0',
       author='BARS Group',
