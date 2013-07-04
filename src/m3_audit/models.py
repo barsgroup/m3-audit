@@ -1,18 +1,17 @@
 #coding:utf-8
-'''
+"""
 Базовые-и-не-только модели для подсистемы аудита
 
 Created on 17.12.2010
 
 @author: akvarats
-'''
+"""
 
 from django.db import models
 from django.core import serializers
 from django.contrib.auth.models import User, AnonymousUser
 
 from m3.db import BaseObjectModel
-from m3.core.json import json_encode
 from manager import AuditManager
 
 

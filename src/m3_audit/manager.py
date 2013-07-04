@@ -1,23 +1,22 @@
 #coding:utf-8
-'''
-
+"""
 Описание менеджера, который обслуживает систему аудита
 
 Created on 21.12.2010
 
 @author: akvarats
-'''
+"""
 
 from django.db import transaction
 
-from m3.helpers import logger
-from m3.data.caching import RuntimeCache
+from m3_legacy import logger
+from m3.caching import RuntimeCache
 
 from exceptions import (DropM3AuditCacheException, 
                         NoWriteMethonInM3AuditException)
 
 
-__all__=('AuditManager',)
+__all__ = ('AuditManager',)
 
 
 class AuditCache(RuntimeCache):

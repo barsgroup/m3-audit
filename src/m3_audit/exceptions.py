@@ -1,9 +1,9 @@
 #coding:utf-8
-'''
+"""
 Created on 22.12.2010
 
 @author: akvarats
-'''
+"""
 
 class M3AuditException(Exception):
     '''

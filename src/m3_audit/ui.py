@@ -1,16 +1,15 @@
 #coding:utf-8
-'''
+"""
 Created on 06.01.2011
 
 @author: akvarats
-'''
-from m3.ui.ext import windows
-from m3.ui.ext import panels
-from m3.ui.ext import containers
-from m3.ui.ext import fields
-from m3.ui.ext.misc import store
+"""
+from m3_ext.ui import windows
+from m3_ext.ui import panels
+from m3_ext.ui import containers
+from m3_ext.ui import fields
+from m3_ext.ui.misc import store
 
-from manager import AuditManager
 from helpers import ext_fields_for_model
 
 

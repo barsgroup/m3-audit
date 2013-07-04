@@ -1,19 +1,20 @@
 #coding:utf-8
-'''
+"""
 Created on 06.01.2011
 
 @author: akvarats
-'''
-from m3.ui.actions import ActionPack, Action, utils, ControllerCache
-from m3.helpers import urls
-from m3.ui import actions
-
-import ui
-from manager import AuditManager
-
+"""
 from datetime import datetime, time
 
-class BaseAuditUIActions(actions.ActionPack):
+from m3.actions import ActionPack, Action, utils, ACD
+from m3.actions.results import PreJsonResult
+from m3_ext.ui.results import ExtUIScriptResult, ExtGridDataQueryResult
+
+from manager import AuditManager
+import ui
+
+
+class BaseAuditUIActions(ActionPack):
     '''
     Базовый пакет действий, который позволяет
     '''
@@ -132,7 +133,7 @@ class BaseAuditUIActions(actions.ActionPack):
         return pre_query
 
 
-class BaseAuditListWindowAction(actions.Action):
+class BaseAuditListWindowAction(Action):
     '''
     Получение окна показа списка записей
     '''
@@ -144,7 +145,7 @@ class BaseAuditListWindowAction(actions.Action):
 
     def context_declaration(self):
         acd_list = self.parent.get_acd()
-        acd_list.extend([actions.ACD(name='audit', type=str, required=True, default=''),])
+        acd_list.extend([ACD(name='audit', type=str, required=True, default=''),])
         return acd_list
 
     def run(self, request, context):
@@ -160,10 +161,10 @@ class BaseAuditListWindowAction(actions.Action):
         window.grid_rows.url_data = self.parent.get_rows_url()
         window = self.parent.configure_window(window, request, context)
 
-        return actions.ExtUIScriptResult(data=window)
+        return ExtUIScriptResult(data=window)
 
 
-class AuditRowsDataAction(actions.Action):
+class AuditRowsDataAction(Action):
     '''
     Действие на получение списка записей выбранного аудита
     '''
@@ -172,10 +173,12 @@ class AuditRowsDataAction(actions.Action):
 
     def context_declaration(self):
         acd_list = self.parent.get_acd()
-        acd_list.extend([actions.ACD(name='audit', type=str, required=True),
-                         actions.ACD(name='start', type=int, required=True, default=-1),
-                         actions.ACD(name='limit', type=int, required=True, default=-1),
-                         actions.ACD(name='created', type=datetime)])
+        acd_list.extend([
+            ACD(name='audit', type=str, required=True),
+            ACD(name='start', type=int, required=True, default=-1),
+            ACD(name='limit', type=int, required=True, default=-1),
+            ACD(name='created', type=datetime),
+        ])
         return acd_list
 
     def run(self, request, context):
@@ -201,12 +204,12 @@ class AuditRowsDataAction(actions.Action):
 
         query = self.parent.get_rows(pre_query, request, context)
 
-        return actions.ExtGridDataQueryResult(data=query,
-                                              start=context.start,
-                                              limit=context.limit)
+        return ExtGridDataQueryResult(data=query,
+                                      start=context.start,
+                                      limit=context.limit)
 
 
-class AuditRowFieldsDataAction(actions.Action):
+class AuditRowFieldsDataAction(Action):
     '''
     Действие на получение записи аудита
     '''
@@ -215,12 +218,12 @@ class AuditRowFieldsDataAction(actions.Action):
 
     def context_declaration(self):
         acd_list = self.parent.get_acd()
-        acd_list.extend([actions.ACD(name='audit', type=str, required=True),
-                         actions.ACD(name='id', type=int, required=True, default=-1),])
+        acd_list.extend([ACD(name='audit', type=str, required=True),
+                         ACD(name='id', type=int, required=True, default=-1),])
         return acd_list
 
     def run(self, request, context):
         model = AuditManager().get(context.audit)
         data = model.objects.get(pk=context.id)
 
-        return actions.PreJsonResult({'data': data})
+        return PreJsonResult({'data': data})

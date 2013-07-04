@@ -7,8 +7,8 @@ from django.db.models.base import ModelBase
 from django import forms as form_fields
 from django.utils.datastructures import SortedDict
 
-from m3.ui.ext import fields as ext_fields
-from m3.ui.ext.misc import store
+from m3_ext.ui import fields as ext_fields
+from m3_ext.ui.misc import store
 
 
 def fields_for_model(model, fields=None, exclude=None, widgets=None, formfield_callback=None):
