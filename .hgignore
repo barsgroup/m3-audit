@@ -13,4 +13,5 @@ relre:~[0-9]+
 relre:.idea$
 relre:^src/env/
 syntax: glob
-
+src/m3_audit.egg-*
+dist/*
