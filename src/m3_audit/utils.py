@@ -1,19 +1,27 @@
 #coding:utf-8
-'''
+u"""
+m3_audit.utils
+--------------
+
 Created on 07.01.2011
 
 @author: akvarats
-'''
+"""
 
 #===============================================================================
 # js shortcuts
 #===============================================================================
 
 def js_audit_list_window(audit_pack, parent_window):
-    '''
+    u"""
     Возвращает js код, который может быть использован для показа окна
     с результатами аудита
-    '''
+
+    :param audit_pack: пак аудита
+    :type audit_pack: :py:class:`m3_audit.actions.BaseAuditUIActions`
+    :param parent_window: родительское окно
+    :type parent_window: :py:class:`m3.ui.ext.windows.ExtWindow`
+    """
     js_template = '''function (){{
     var parent_window = Ext.getCmp('{parent_window_client_id}');
     var params = {{}};

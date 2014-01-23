@@ -1,5 +1,8 @@
 #coding: utf-8
 """
+m3_audit.helpers
+----------------
+
 Created on 29.10.11
 @author: ruldashev
 """
@@ -12,18 +15,15 @@ from m3.ui.ext.misc import store
 
 
 def fields_for_model(model, fields=None, exclude=None, widgets=None, formfield_callback=None):
-    """
-    Returns a ``SortedDict`` containing form fields for the given model.
+    u"""Возвращает словарь, содержащий поля модели. В отличии от
+    :py:meth:`django.forms.models.fields_for_model` вытаскивает также non editable поля
 
-    ``fields`` is an optional list of field names. If provided, only the named
-    fields will be included in the returned fields.
-
-    ``exclude`` is an optional list of field names. If provided, the named
-    fields will be excluded from the returned fields, even if they are listed
-    in the ``fields`` argument.
-
-    Вынужденная копия django.forms.models.fields_for_model с тем лишь отличием,
-    что мы вытаскиваем также non editable поля
+    :param model: модель приложения
+    :type model: :py:class:`django.db.models.model`
+    :param fields: указанные филды добавятся в результат
+    :type fields: list
+    :param exclude: указанные филды исключатся из результата
+    :type fields: list
     """
     field_list = []
     ignored = []
@@ -59,9 +59,14 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None, formfield_c
 
 
 def ext_fields_for_model(model, exclusion=[]):
-    '''
-    Возвращает список ExtFields для полей модели
-    '''
+    u"""
+    Возвращает список, содержащий поля модели в виде ExtFields.
+
+    :param model: модель приложения
+    :type model: :py:class:`django.db.models.model`
+    :param exclusion: указанные филды исключатся из результата
+    :type exclusion: list
+    """
     assert isinstance(model, ModelBase)
     model_ext_fields = {}
     

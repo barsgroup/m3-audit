@@ -1,9 +1,12 @@
 #coding:utf-8
-'''
+u"""
+m3_audit.actions
+----------------
+
 Created on 06.01.2011
 
 @author: akvarats
-'''
+"""
 from m3.ui.actions import ActionPack, Action, utils, ControllerCache
 from m3.helpers import urls
 from m3.ui import actions
@@ -14,10 +17,8 @@ from manager import AuditManager
 from datetime import datetime, time
 
 class BaseAuditUIActions(actions.ActionPack):
-    '''
-    Базовый пакет действий, который позволяет
-    '''
-    
+    u"""Базовый пакет действий, который позволяет работать с аудитами системы
+    """
     model = None
     acd = []
 
@@ -38,42 +39,58 @@ class BaseAuditUIActions(actions.ActionPack):
                              ])
 
     def get_acd(self):
-        '''
-        Возвращает context declaration на основе данных, прописанных
-        при настройке дочернего класса
-        '''
+        u"""Возвращает список правил
+        :py:attr:`m3_audit.actions.BaseAuditUIActions.acd`,
+        прописанных при настройке дочернего класса
+        """
         if hasattr(self, 'acd'):
             return self.acd
     
     def get_list_window(self, window, request, context):
-        '''
-        Возвращает окно, в котором отображаются результаты аудита
-        '''
+        u"""Возвращает окно :py:class:`m3.ui.ext.windows.ExtWindow`,
+        в котором отображаются результаты аудита
+
+        :param window: окно, в котором отображаются результаты аудита
+        :type window: :py:class:`m3.ui.ext.windows.ExtWindow`
+        :param request: параметры запроса
+        :param context: контекст запроса
+        :type context: :py:class:`m3.ui.actions.context.ActionContext`
+        """
         return window
 
     def get_list_url(self):
-        '''
-        Возвращает полный URL до действия на получение окна со списком
-        записей аудита
-        '''
+        u"""Возвращает полный URL до действия
+        :py:class:`m3_audit.actions.BaseAuditListWindowAction` (
+        окно списка записей аудита)
+        """
         return self.list_window_action.absolute_url()
 
     def get_rows_url(self):
-        '''
-        Возвращает полный URL до действия на получение записей аудита
-        '''
+        u"""Возвращает полный URL до действия
+        :py:class:`m3_audit.actions.AuditRowsDataAction` (
+        список записей аудита)
+        """
         return self.rows_action.absolute_url()
 
     def get_row_fields_url(self):
-        '''
-        Возвращает полный URL до действия на получение данных по записи аудита
-        '''
+        u"""Возвращает полный URL до действия
+        :py:class:`m3_audit.actions.AuditRowFieldsDataAction` (
+        запись аудита)
+        :rtype: str
+        """
         return self.fields_action.absolute_url()
 
     def configure_window(self, window, request, context):
-        '''
-        Конфигурация окна, выделено для возможности переопределения
-        '''
+        u"""Возвращает сконфигурированное окно
+        :py:class:`m3.ui.ext.windows.ExtWindow`
+        выделено для возможности переопределения
+
+        :param window: окно, в котором отображаются результаты аудита
+        :type window: :py:class:`m3.ui.ext.windows.ExtWindow`
+        :param request: параметры запроса
+        :param context: контекст запроса
+        :type context: :py:class:`m3.ui.actions.context.ActionContext`
+        """
         top_panel = self.get_top_panel(window, request, context)
         if top_panel:
             window.items.append(top_panel)
@@ -84,10 +101,16 @@ class BaseAuditUIActions(actions.ActionPack):
         return window
 
     def get_east_panel(self, window, request, context):
-        '''
-        Возвращает панель с опциональными элементами формы,
-        построенными по модели (list_fields)
-        '''
+        u"""Возвращает панель
+        :py:class:`m3_audit.ui.DefaultEastPanel`
+        с опциональными элементами формы, построенными по модели (list_fields)
+
+        :param window: окно, с опциональными элементами формы
+        :type window: :py:class:`m3.ui.ext.windows.ExtWindow`
+        :param request: параметры запроса
+        :param context: контекст запроса
+        :type context: :py:class:`m3.ui.actions.context.ActionContext`
+        """
         panel = ui.DefaultEastPanel()
         model = AuditManager().get(context.audit)
         panel.create_fields(model)
@@ -97,9 +120,17 @@ class BaseAuditUIActions(actions.ActionPack):
         return panel
 
     def get_top_panel(self, window, request, context):
-        '''
-        Возвращает панель с опциональным списком для выбора аудита (list_audit)
-        '''
+        u"""Возвращает панель
+        :py:class:`m3_audit.ui.DefaultTopPanel`
+        с опциональными списком для выбора аудита (list_audit)
+
+        :param window: окно, с опциональными списком для выбора
+            аудита (list_audit)
+        :type window: :py:class:`m3.ui.ext.windows.ExtWindow`
+        :param request: параметры запроса
+        :param context: контекст запроса
+        :type context: :py:class:`m3.ui.actions.context.ActionContext`
+        """
         panel = ui.DefaultTopPanel()
 
         # формируем список аудитов для комбо
@@ -114,9 +145,15 @@ class BaseAuditUIActions(actions.ActionPack):
         return panel
 
     def apply_column_filter(self, pre_query, request, context):
-        '''
-        Накладывает на запрос колоночный фильтр
-        '''
+        u"""Возвращает отфильтрованный запрос
+        :py:class:`django.db.models.query.QuerySet`
+
+        :param pre_query: запрос
+        :type pre_query: :py:class:`django.db.models.query.QuerySet`
+        :param request: параметры запроса
+        :param context: контекст запроса
+        :type context: :py:class:`m3.ui.actions.context.ActionContext`
+        """
         columns_map = {}
         model = pre_query.model
         for column in model.list_columns:
@@ -127,15 +164,21 @@ class BaseAuditUIActions(actions.ActionPack):
         return pre_query
 
     def get_rows(self, pre_query, request, context):
-        '''
-        '''
+        u"""Возвращает запрос
+        :py:class:`django.db.models.query.QuerySet`
+
+        :param pre_query: запрос
+        :type pre_query: :py:class:`django.db.models.query.QuerySet`
+        :param request: параметры запроса
+        :param context: контекст запроса
+        :type context: :py:class:`m3.ui.actions.context.ActionContext`
+        """
         return pre_query
 
 
 class BaseAuditListWindowAction(actions.Action):
-    '''
-    Получение окна показа списка записей
-    '''
+    u"""Действие, получение окна показа списка записей
+    """
     url = '/list-window'
     shortname = 'audit-list-window'
 
@@ -148,6 +191,14 @@ class BaseAuditListWindowAction(actions.Action):
         return acd_list
 
     def run(self, request, context):
+        u"""Возвращает окно
+        :py:class:`m3.ui.actions.results.ExtUIScriptResult`
+        списка записей
+
+        :param request: параметры запроса
+        :param context: параметры запроса
+        :type context: :py:class:`m3.ui.actions.context.ActionContext`
+        """
         if not context.audit:
             # По умолчанию откроем первый попавшийся аудит
             context.audit = self.parent.list_audits[0]
@@ -164,9 +215,8 @@ class BaseAuditListWindowAction(actions.Action):
 
 
 class AuditRowsDataAction(actions.Action):
-    '''
-    Действие на получение списка записей выбранного аудита
-    '''
+    u"""Действие на получение списка записей выбранного аудита
+    """
     url = '/rows'
     shortname = 'audit-rows'
 
@@ -179,9 +229,12 @@ class AuditRowsDataAction(actions.Action):
         return acd_list
 
     def run(self, request, context):
-        '''
-        Выполняет построение предварительного запроса и отдает в функцию
-        '''
+        u"""Возвращает данные в формате, пригодном для отображения в гриде
+
+        :param request: параметры запроса
+        :param context: контекст запроса
+        :type context: :py:class:`m3.ui.actions.context.ActionContext`
+        """
         direction = request.REQUEST.get('dir')
         user_sort = request.REQUEST.get('sort')
         if direction == 'DESC':
@@ -207,9 +260,9 @@ class AuditRowsDataAction(actions.Action):
 
 
 class AuditRowFieldsDataAction(actions.Action):
-    '''
-    Действие на получение записи аудита
-    '''
+    u"""Действие на получение записи аудита
+    """
+
     url = '/row-fields'
     shortname = 'audit-row-fields'
 
@@ -220,6 +273,14 @@ class AuditRowFieldsDataAction(actions.Action):
         return acd_list
 
     def run(self, request, context):
+        u"""Возвращает список объектов, готовых к сериализации в JSON формат и
+        отправке в HttpResponse.
+
+        :param request: параметры запроса
+        :param context: контекст запроса
+        :type context: :py:class:`m3.ui.actions.context.ActionContext`
+        """
+
         model = AuditManager().get(context.audit)
         data = model.objects.get(pk=context.id)
 

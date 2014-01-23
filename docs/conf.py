@@ -1,8 +1,20 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime
+import sys
+import os
 
-extensions = []
+#sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath('../src'))
+
+import django.conf
+if not django.conf.settings.configured:
+    django.conf.settings.configure(default_settings=django.conf.global_settings)
+
+extensions = [
+    'sphinx.ext.autodoc',
+]
+
+from datetime import datetime
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

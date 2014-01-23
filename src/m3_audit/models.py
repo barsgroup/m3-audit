@@ -1,11 +1,14 @@
 #coding:utf-8
-'''
-Базовые-и-не-только модели для подсистемы аудита
+u"""
+m3_audit.models
+---------------
+
+модели для подсистемы аудита
 
 Created on 17.12.2010
 
 @author: akvarats
-'''
+"""
 
 from django.db import models
 from django.core import serializers
@@ -17,10 +20,10 @@ from manager import AuditManager
 
 
 class BaseAuditModel(BaseObjectModel):
-    '''
+    u"""
     Базовая модель, от которой наследуются все 
     модели хранения результатов аудита
-    '''
+    """
     
     # данные пользователя. специально не делается ForeignKey.
     # чтобы не быть завязанными на ссылочную целостность
@@ -61,9 +64,12 @@ class BaseAuditModel(BaseObjectModel):
         abstract = True
         
     def by_user(self, user):
-        '''
+        u"""
         Заполняет значения полей моделей на основе переданного пользователя
-        '''
+
+        :param user: пользователь
+        :type user: :py:class:`django.db.models.Models`
+        """
         if isinstance(user, User):
             self.username = user.username
             self.userid = user.id  
@@ -75,9 +81,9 @@ class BaseAuditModel(BaseObjectModel):
 
     
 class BaseModelChangeAuditModel(BaseAuditModel):
-    '''
+    u"""
     Аудит, предназначенный для отслеживания изменений в моделях системы
-    '''
+    """
     
     #===========================================================================
     # Типы операций над моделью
@@ -109,6 +115,15 @@ class BaseModelChangeAuditModel(BaseAuditModel):
     
     @classmethod
     def write(cls, user, model_object, type, *args, **kwargs):
+        u"""
+        Записывает изменения в моделях системы
+
+        :param user: пользоватьель
+        :type user: :py:class:`django.contrib.auth.models.User`
+        :param model_object: модель системы
+        :type model_object: :py:class:`django.db.models.Models`
+        :param type: тип действия (добавление, удаление, редактирование)
+        """
         
         audit = cls()
         audit.by_user(user)
@@ -144,9 +159,9 @@ class BaseModelChangeAuditModel(BaseAuditModel):
 # Общий аудит для сохранения информации об изменении моделей
 #===============================================================================
 class DefaultModelChangeAuditModel(BaseModelChangeAuditModel):
-    '''
+    u"""
     Модель дефолтного аудита изменения моделей
-    '''
+    """
     
     class Meta:
         verbose_name = u'Изменения таблиц системы'
@@ -157,9 +172,9 @@ AuditManager().register('model-changes', DefaultModelChangeAuditModel)
 # Аудит для сохранения информации об изменении записей справочников
 #===============================================================================
 class DictChangesAuditModel(BaseModelChangeAuditModel):
-    '''
+    u"""
     Модель аудита изменения в справочниках
-    '''
+    """
     
     class Meta:
         verbose_name = u'Изменения в справочниках'
@@ -170,9 +185,9 @@ AuditManager().register('dict-changes', DictChangesAuditModel)
 # Преднастроенный аудит для входов/выходов пользователей из системы
 #===============================================================================
 class AuthAuditModel(BaseAuditModel):
-    '''
+    u"""
     Аудит входов/выходов пользователя из системы
-    '''
+    """
     #===========================================================================
     # Тип авторизации пользователя
     #===========================================================================
@@ -192,9 +207,13 @@ class AuthAuditModel(BaseAuditModel):
 
     @classmethod
     def write(cls, user, type='login', *args, **kwargs):
-        '''
+        u"""
         Пишем информацию об аудите входа/выхода
-        '''
+
+        :param user: пользоватьель
+        :type user: :py:class:`django.contrib.auth.models.User`
+        :param type: тип действия (авторизация, выход)
+        """
         audit = AuthAuditModel()
         audit.by_user(user)
         audit.type = AuthAuditModel.LOGIN if type == 'login' else AuthAuditModel.LOGOUT
@@ -208,7 +227,9 @@ AuditManager().register('auth', AuthAuditModel)
 
 ## Структура данных аудита по действиям над ролями пользователей
 class RolesAuditModel(BaseAuditModel):
-    ''' Структура данных аудита действий над ролями пользователей '''
+    u"""
+    Структура данных аудита действий над ролями пользователей
+    """
     PERMISSION_ADDITION = 0
     PERMISSION_REMOVAL = 1
     PERMISSION_ENABLEMENT = 2
@@ -235,7 +256,15 @@ class RolesAuditModel(BaseAuditModel):
     @classmethod
     def write(cls, user, role, permission_or_code=None, type=PERMISSION_ADDITION,
                *args, **kwargs):
-        ''' Непосредственная запись '''
+        u"""
+        Непосредственная запись
+
+        :param user: пользоватьель
+        :type user: :py:class:`django.contrib.auth.models.User`
+        :param role: роль
+        :param permission_or_code: разрешения
+        :param type: действие (добавление, лишение, активация, отключение)
+        """
         audit = RolesAuditModel(); audit.by_user(user)
         
         audit.type = type
@@ -248,10 +277,16 @@ class RolesAuditModel(BaseAuditModel):
     def set_role(self, role):
         self.role_id = role.id
         self.role_name = role.name
+
     role = property(get_role, set_role)
     
     @classmethod
-    def parse_permission(cls, perm):    
+    def parse_permission(cls, perm):
+        u"""
+        Возвращает разрешение
+
+        :param perm: разрешение
+        """
         permission_code = perm; return permission_code
     
     class Meta:

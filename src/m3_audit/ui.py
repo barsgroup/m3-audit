@@ -1,9 +1,12 @@
 #coding:utf-8
-'''
+u"""
+m3_audit.ui
+-----------
+
 Created on 06.01.2011
 
 @author: akvarats
-'''
+"""
 from m3.ui.ext import windows
 from m3.ui.ext import panels
 from m3.ui.ext import containers
@@ -15,9 +18,9 @@ from helpers import ext_fields_for_model
 
 
 class AuditListWindow(windows.ExtWindow):
-    '''
+    u"""
     Окно со списком записей аудита
-    '''
+    """
     def __init__(self, *args, **kwargs):
         super(AuditListWindow, self).__init__(*args, **kwargs)
 
@@ -45,9 +48,14 @@ class AuditListWindow(windows.ExtWindow):
         self.items.extend([self.panel_center,])
 
     def create_columns(self, columns, model=None):
-        '''
-        Добавляет отображаемые колонки. Реализазация - как в диктах
-        '''
+        u"""
+        Добавляет в грид колокни
+
+        :param columns: добавляемые колонки
+        :type columns: list, tuple
+        :param model: модель аудита
+        :type model: :py:class:`django.db.models.Models`
+        """
 
         # получим поля модели в виде ExtFields,
         # чтобы сформировать подходящие хэдэр-фильтры
@@ -78,11 +86,11 @@ class AuditListWindow(windows.ExtWindow):
 
             self.grid_rows.add_column(**column_params)
 
-        
+
 class DefaultEastPanel(panels.ExtPanel):
-    '''
+    u"""
     Панель с полями конкретной записи
-    '''
+    """
     
     def __init__(self, *args, **kwargs):
         super(DefaultEastPanel, self).__init__(*args, **kwargs)
@@ -105,9 +113,12 @@ class DefaultEastPanel(panels.ExtPanel):
         self.init_component(*args, **kwargs)
 
     def create_fields(self, model):
-        '''
-        Добавляет поля для просмотра записи на основе полей в модели
-        '''
+        u"""
+        Добавляет поля из модели, для просмотра записи на основе полей в модели
+
+        :param model: модель аудита
+        :type model: :py:class:`django.db.models.Models`
+        """
         ext_fields = ext_fields_for_model(model)
 
         if model.list_fields:
@@ -127,9 +138,9 @@ class DefaultEastPanel(panels.ExtPanel):
 
 
 class DefaultTopPanel(containers.ExtContainer):
-    '''
+    u"""
     Панель с выбором нужного аудита
-    '''
+    """
 
     def __init__(self, *args, **kwargs):
         super(DefaultTopPanel, self).__init__(*args, **kwargs)
@@ -142,9 +153,14 @@ class DefaultTopPanel(containers.ExtContainer):
         self.init_component(*args, **kwargs)
     
     def create_audits_combo(self, list_audits, current_audit=''):
-        '''
+        u"""
         Создает комбо со списком аудитов для перехода между ними
-        '''
+
+        :param list_audits: список аудитов
+        :type list_audits: list
+        :param current_audit: теукщий аудит
+        :type current_audit: str
+        """
         f_audits_combo = fields.ExtComboBox()
         f_audits_combo.name = 'audit_id'
         f_audits_combo.label = u'Аудит'
