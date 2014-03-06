@@ -8,11 +8,13 @@ Created on 22.12.2010
 @author: akvarats
 """
 
+
 class M3AuditException(Exception):
     u"""
     Некоторое исключение подсистемы аудита
     """
     pass
+
 
 class DropM3AuditCacheException(M3AuditException):
     u"""
@@ -20,6 +22,7 @@ class DropM3AuditCacheException(M3AuditException):
     зарегистрированные типы аудита
     """
     pass
+
 
 class NoWriteMethonInM3AuditException(M3AuditException):
     u"""

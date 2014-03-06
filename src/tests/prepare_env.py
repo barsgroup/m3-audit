@@ -15,15 +15,16 @@ from decimal import Decimal
 REPO_LOCATION = 'https://readonly:onlyread@repos.med.bars-open.ru/'
 TOPMOST_VERSION = 'zzzzzzzzz'
 
+
 #===============================================================================
 # Точка входа.
 #===============================================================================
 
 def start(as_repos=False):
-    '''
+    """
     Точка входа. 
-    '''
-    has_error= False
+    """
+    has_error = False
     
     script_root = os.path.dirname(__file__)
     env_root = os.path.join(script_root, '../env')
@@ -49,8 +50,7 @@ def start(as_repos=False):
         
     #sys.path.insert(0, env_root)
     sys.path.insert(0, os.path.dirname(__file__))
-    
-        
+
     if not os.path.exists(envbuild_root):
         os.mkdir(envbuild_root)
     
@@ -60,8 +60,7 @@ def start(as_repos=False):
         
     for require_app, require_path in root_require_locals.iteritems():
         app_queue.put(AppDescription(require_app, require_path, is_local=True))
-        
-    
+
     #os.chdir('../')
     # основной цикл обработки
     while not app_queue.empty():
@@ -146,7 +145,8 @@ def start(as_repos=False):
     print '  ', root_appname + ':', root_version
     for app, version in processed_apps.iteritems():
         print '  ', app + ':', synced_locally.get(app, version)
-    
+
+
 def clone_repo(app_name, app_repo_root):
     
     out, err = run_command(['hg', 'clone', REPO_LOCATION + app_name, app_repo_root])
@@ -154,6 +154,7 @@ def clone_repo(app_name, app_repo_root):
         print '  ', u'Клонирование репозитория', REPO_LOCATION + app_name, u'завершено с ошибкой:', err
         
     return not err
+
 
 def pull_repo(app_repo_root):
     
@@ -163,6 +164,7 @@ def pull_repo(app_repo_root):
         
     return not err
 
+
 def update_repo(app_repo_root, app_version):
     
     out, err = run_command(['hg', 'update', app_version, '-R', app_repo_root])
@@ -170,6 +172,7 @@ def update_repo(app_repo_root, app_version):
         print '  ', u'Обновление репозитория', app_repo_root, u'не ветку', app_version, u'завершено с ошибкой:', err
         
     return not err
+
 
 def copy_sources(app_name, env_root, app_repo_root):
     
@@ -181,9 +184,9 @@ def copy_sources(app_name, env_root, app_repo_root):
     
 
 def app_version(app_name=''):    
-    '''
+    """
     Возвращает кортеж из трех элементов (app_version, require, require_local)
-    '''
+    """
     module = import_module('%s.version' % app_name if app_name else 'version' )
     reload(module)
         
@@ -191,7 +194,8 @@ def app_version(app_name=''):
             module.__appname__,
             module.__require__,
             module.__require_local__ if hasattr(module, '__require_local__') else {},)
-    
+
+
 #===============================================================================
 # Внутренние классы
 #===============================================================================
@@ -202,14 +206,15 @@ class AppDescription(object):
         self.version = version
         self.is_local = is_local
 
+
 #===============================================================================
 # Внутренние функции
 #===============================================================================
 def run_command(command):
-    '''
+    """
     Выполняет команду как subprocess,
-    возвращает (stdout, stderr) процесса 
-    '''
+    возвращает (stdout, stderr) процесса
+    """
     popen = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     popen.wait()
     return popen.communicate()
@@ -224,8 +229,7 @@ def _resolve_name(name, package, level):
         try:
             dot = package.rindex('.', 0, dot)
         except ValueError:
-            raise ValueError("attempted relative import beyond top-level "
-                              "package")
+            raise ValueError("attempted relative import beyond top-level package")
     return "%s.%s" % (package[:dot], name)
 
 
@@ -248,6 +252,7 @@ def import_module(name, package=None):
         name = _resolve_name(name[level:], package, level)
     __import__(name)
     return sys.modules[name]
+
 
 def force_unicode(s, encoding='utf-8', strings_only=False, errors='strict'):
     """
@@ -297,6 +302,7 @@ def force_unicode(s, encoding='utf-8', strings_only=False, errors='strict'):
             s = ' '.join([force_unicode(arg, encoding, strings_only,
                     errors) for arg in s])
     return s
+
 
 def is_protected_type(obj):
     """Determine if the object instance is of a protected type.

@@ -7,6 +7,11 @@ Created on 06.01.2011
 
 @author: akvarats
 """
+
+# TODO: пофиксить импорты экшенов, одно и тоже два раза импортируется
+
+from datetime import datetime, time
+
 from m3.ui.actions import ActionPack, Action, utils, ControllerCache
 from m3.helpers import urls
 from m3.ui import actions
@@ -14,11 +19,9 @@ from m3.ui import actions
 import ui
 from manager import AuditManager
 
-from datetime import datetime, time
 
 class BaseAuditUIActions(actions.ActionPack):
-    u"""Базовый пакет действий, который позволяет работать с аудитами системы
-    """
+    u"""Базовый пакет действий, который позволяет просмотреть записи аудитов"""
     model = None
     acd = []
 
@@ -35,8 +38,7 @@ class BaseAuditUIActions(actions.ActionPack):
         
         self.actions.extend([self.rows_action,
                              self.list_window_action,
-                             self.fields_action,
-                             ])
+                             self.fields_action])
 
     def get_acd(self):
         u"""Возвращает список правил
@@ -187,6 +189,7 @@ class BaseAuditListWindowAction(actions.Action):
 
     def context_declaration(self):
         acd_list = self.parent.get_acd()
+        # TODO: можно обойтись append'ом
         acd_list.extend([actions.ACD(name='audit', type=str, required=True, default=''),])
         return acd_list
 
@@ -245,9 +248,10 @@ class AuditRowsDataAction(actions.Action):
         pre_query = model.objects.all()
 
         if request.REQUEST.get('created'):
-           end_day = datetime.combine(context.created.date(), time.max)
-           pre_query = pre_query.filter(created__gte=context.created)
-           pre_query = pre_query.filter(created__lte=end_day)
+            end_day = datetime.combine(context.created.date(), time.max)
+            # TODO: можно обойтись одним фильтром
+            pre_query = pre_query.filter(created__gte=context.created)
+            pre_query = pre_query.filter(created__lte=end_day)
 
         pre_query = self.parent.apply_column_filter(pre_query, request, context)
         pre_query = utils.apply_sort_order(pre_query, model.list_columns, sort_order)
@@ -269,7 +273,7 @@ class AuditRowFieldsDataAction(actions.Action):
     def context_declaration(self):
         acd_list = self.parent.get_acd()
         acd_list.extend([actions.ACD(name='audit', type=str, required=True),
-                         actions.ACD(name='id', type=int, required=True, default=-1),])
+                         actions.ACD(name='id', type=int, required=True, default=-1)])
         return acd_list
 
     def run(self, request, context):

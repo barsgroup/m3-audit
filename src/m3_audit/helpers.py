@@ -8,6 +8,7 @@ Created on 29.10.11
 """
 from django.db.models.base import ModelBase
 from django import forms as form_fields
+# TODO: collections.OrderedDict не подойдет?
 from django.utils.datastructures import SortedDict
 
 from m3.ui.ext import fields as ext_fields
@@ -29,6 +30,7 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None, formfield_c
     ignored = []
     opts = model._meta
     for f in opts.fields + opts.many_to_many:
+        # TODO: обязательно проверять на None
         if fields is not None and not f.name in fields:
             continue
         if exclude and f.name in exclude:
@@ -38,6 +40,7 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None, formfield_c
         else:
             kwargs = {}
 
+        # TODO: обязательно проверять на None
         if formfield_callback is None:
             formfield = f.formfield(**kwargs)
         elif not callable(formfield_callback):
@@ -58,6 +61,7 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None, formfield_c
     return field_dict
 
 
+# TODO: такое объявление списка не желательно, насколько помнится
 def ext_fields_for_model(model, exclusion=[]):
     u"""
     Возвращает список, содержащий поля модели в виде ExtFields.
@@ -72,6 +76,7 @@ def ext_fields_for_model(model, exclusion=[]):
     
     # маппер Django Forms Fields -> ExtFields
     # TODO: использовать общий маппер (если/когда он будет)
+    # TODO: не лучше создавать словарь сразу заполненным
     mapper = dict()
     default_field = ext_fields.ExtStringField
     mapper[form_fields.IntegerField] = ext_fields.ExtNumberField

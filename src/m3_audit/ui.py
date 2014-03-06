@@ -7,12 +7,14 @@ Created on 06.01.2011
 
 @author: akvarats
 """
+# TODO: можно же импортнуть в одну строчку все
 from m3.ui.ext import windows
 from m3.ui.ext import panels
 from m3.ui.ext import containers
 from m3.ui.ext import fields
 from m3.ui.ext.misc import store
 
+# TODO: не используется в модуле
 from manager import AuditManager
 from helpers import ext_fields_for_model
 
@@ -40,11 +42,13 @@ class AuditListWindow(windows.ExtWindow):
         self.grid_rows.sm = containers.ExtGridRowSelModel(single_select=True)
         self.grid_rows.store.remote_sort = True
         self.grid_rows.handler_click = 'rowChangeHandler'
+        # TODO: может хватит и append
         self.grid_rows.plugins.extend([
             'new Ext.ux.grid.GridHeaderFilters()',
         ])
         
         self.panel_center.items.append(self.grid_rows)
+        # TODO: может хватит и append
         self.items.extend([self.panel_center,])
 
     def create_columns(self, columns, model=None):
@@ -63,9 +67,9 @@ class AuditListWindow(windows.ExtWindow):
 
         for column in columns:
             if isinstance(column, tuple):
-                column_params = { 'data_index': column[0], 'header': column[1],
-                                  'sortable': True }
-                if len(column)>2:
+                column_params = {'data_index': column[0], 'header': column[1],
+                                 'sortable': True}
+                if len(column) > 2:
                     column_params['width'] = column[2]
             elif isinstance(column, dict):
                 column_params = column
@@ -161,6 +165,7 @@ class DefaultTopPanel(containers.ExtContainer):
         :param current_audit: теукщий аудит
         :type current_audit: str
         """
+        # TODO: почему бы не определять параметры объекта при его инициализации
         f_audits_combo = fields.ExtComboBox()
         f_audits_combo.name = 'audit_id'
         f_audits_combo.label = u'Аудит'

@@ -11,7 +11,7 @@ Created on 21.12.2010
 """
 
 from django.db import transaction
-
+# TODO: данная штука вроде как deprecated
 from m3.helpers import logger
 from m3.data.caching import RuntimeCache
 
@@ -19,7 +19,7 @@ from exceptions import (DropM3AuditCacheException,
                         NoWriteMethonInM3AuditException)
 
 
-__all__=('AuditManager',)
+__all__ = ('AuditManager',)
 
 
 class AuditCache(RuntimeCache):
@@ -33,10 +33,14 @@ class AuditCache(RuntimeCache):
         raise DropM3AuditCacheException()
     
     
-
 class AuditManager(object):
-    u"""
-    Менеджер, который выполняет запись результатов аудита
+    u"""Менеджер, который проводит аудит приложений системы
+    Основной объект модуля аудит, передав необходимые параметры в метод :py:meth:`write`
+    сохранится аудит по приложению
+
+    пример:
+
+        >>> AuditManager().write()
     """
     
     def register(self, audit_name, audit_model):
@@ -47,6 +51,11 @@ class AuditManager(object):
         :type audit_name: str
         :param audit_model: модель аудита
         :type audit_model: :py:class:`django.db.models.model`
+
+        пример:
+
+            >>> AuditManager().register('model-changes', DefaultModelChangeAuditModel)
+
         """
         
         if not hasattr(audit_model, 'write'):
@@ -74,15 +83,21 @@ class AuditManager(object):
     @transaction.commit_on_success
     def write(self, audit_name, user, *args, **kwargs):
         u"""
+        Основной метод модуля аудит.
         Выполняет операцию записи об аудите в базу данных
 
         :param audit_name: название аудита
         :type audit_name: str
         :param user: пользователь системы
+
+        пример:
+
+            >>> AuditManager().write('dict-changes', user=request.user, model_object=obj, type='delete')
         """
         audit = self.get(audit_name, None)
         if audit:
             try:
                 audit.write(user, *args, **kwargs)
             except:
+                # TODO: не помешало бы записать текст ошибки, для информативности
                 logger.exception(u'Не удалось записать результаты аудита \'%s\'' % audit_name)

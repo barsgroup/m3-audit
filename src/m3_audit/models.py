@@ -15,6 +15,7 @@ from django.core import serializers
 from django.contrib.auth.models import User, AnonymousUser
 
 from m3.db import BaseObjectModel
+# TODO: вроде нигде не используется в модуле
 from m3.core.json import json_encode
 from manager import AuditManager
 
@@ -70,6 +71,7 @@ class BaseAuditModel(BaseObjectModel):
         :param user: пользователь
         :type user: :py:class:`django.db.models.Models`
         """
+        # TODO: может лучше проверять user.is_anonymous()
         if isinstance(user, User):
             self.username = user.username
             self.userid = user.id  
@@ -100,7 +102,8 @@ class BaseModelChangeAuditModel(BaseAuditModel):
     # данные модели, на момент записи аудита
     object_data = models.TextField(u'Данные модели')
     
-    type = models.PositiveIntegerField(u'Действие', choices=((ADD, u'Добавление'),
+    type = models.PositiveIntegerField(u'Действие',
+                                       choices=((ADD, u'Добавление'),
                                                 (EDIT, u'Изменение'),
                                                 (DELETE, u'Удаление'),),
                                        db_index=True)
@@ -112,7 +115,8 @@ class BaseModelChangeAuditModel(BaseAuditModel):
         ('type', u'Действие', 70),
         ('created', u'Дата'),
     ]
-    
+
+    # TODO: переименовать type, чтобы не перекрывал стандартный объект type
     @classmethod
     def write(cls, user, model_object, type, *args, **kwargs):
         u"""
@@ -140,7 +144,8 @@ class BaseModelChangeAuditModel(BaseAuditModel):
               type == 'remove' or
               type == 'delete'):
             audit.type = BaseModelChangeAuditModel.DELETE
-            
+
+        # TODO: model_object.id or 0 красивей
         audit.object_id = model_object.id if model_object.id else 0
         audit.object_model = (model_object.__class__.__module__ + 
                               '.' + 
@@ -148,6 +153,7 @@ class BaseModelChangeAuditModel(BaseAuditModel):
         try:
             audit.object_data = serializers.serialize('json', [model_object,])
         except:
+            # TODO: лучше залогировать ошибку
             pass
         audit.save()
     
@@ -160,33 +166,37 @@ class BaseModelChangeAuditModel(BaseAuditModel):
 #===============================================================================
 class DefaultModelChangeAuditModel(BaseModelChangeAuditModel):
     u"""
-    Модель дефолтного аудита изменения моделей
+    Модель аудита, регистрирует изменения таблиц системы
     """
     
     class Meta:
         verbose_name = u'Изменения таблиц системы'
         db_table = 'm3_audit_model_changes'
         
-AuditManager().register('model-changes', DefaultModelChangeAuditModel)        
+AuditManager().register('model-changes', DefaultModelChangeAuditModel)
+
+
 #===============================================================================
 # Аудит для сохранения информации об изменении записей справочников
 #===============================================================================
 class DictChangesAuditModel(BaseModelChangeAuditModel):
     u"""
-    Модель аудита изменения в справочниках
+    Модель аудита, регистрирует изменения в справочниках
     """
     
     class Meta:
         verbose_name = u'Изменения в справочниках'
         db_table = 'm3_audit_dict_changes'
 
-AuditManager().register('dict-changes', DictChangesAuditModel) 
+AuditManager().register('dict-changes', DictChangesAuditModel)
+
+
 #===============================================================================
 # Преднастроенный аудит для входов/выходов пользователей из системы
 #===============================================================================
 class AuthAuditModel(BaseAuditModel):
     u"""
-    Аудит входов/выходов пользователя из системы
+    Модель аудита, регистрирует входы/выходы пользователя из системы
     """
     #===========================================================================
     # Тип авторизации пользователя
@@ -194,7 +204,8 @@ class AuthAuditModel(BaseAuditModel):
     LOGIN = 0
     LOGOUT = 1
     
-    type = models.PositiveIntegerField(u'Действие', choices=((LOGIN, u'Вход в систему'),
+    type = models.PositiveIntegerField(u'Действие',
+                                       choices=((LOGIN, u'Вход в систему'),
                                                 (LOGOUT, u'Выход из системы'),), 
                                        db_index=True)
 
@@ -205,6 +216,7 @@ class AuthAuditModel(BaseAuditModel):
         ('created', u'Дата'),
     ]
 
+    # TODO: переименовать type, чтобы не перекрывал стандартный объект type
     @classmethod
     def write(cls, user, type='login', *args, **kwargs):
         u"""
@@ -225,17 +237,19 @@ class AuthAuditModel(BaseAuditModel):
 
 AuditManager().register('auth', AuthAuditModel)
 
+
 ## Структура данных аудита по действиям над ролями пользователей
 class RolesAuditModel(BaseAuditModel):
     u"""
-    Структура данных аудита действий над ролями пользователей
+    Модель аудита, регистрирует изменения ролей пользователей
     """
     PERMISSION_ADDITION = 0
     PERMISSION_REMOVAL = 1
     PERMISSION_ENABLEMENT = 2
     PERMISSION_DISABLEMENT = 3
     
-    type = models.PositiveIntegerField(u'Действие', choices=((PERMISSION_ADDITION, u'Добавление прав'),
+    type = models.PositiveIntegerField(u'Действие',
+                                       choices=((PERMISSION_ADDITION, u'Добавление прав'),
                                                 (PERMISSION_REMOVAL, u'Лишение прав'),
                                                 (PERMISSION_ENABLEMENT, u'Активация права'),
                                                 (PERMISSION_DISABLEMENT, u'Отключение права')
@@ -243,7 +257,7 @@ class RolesAuditModel(BaseAuditModel):
     role_id = models.PositiveIntegerField(u'ID роли')
     role_name = models.CharField(u'Роль', max_length=200)
     permission_code = models.CharField(u'Разрешения', max_length=200,
-                                        null=True, blank=True, default='')
+                                       null=True, blank=True, default='')
 
     list_columns = [
         ('username', u'Пользователь'),
@@ -253,9 +267,10 @@ class RolesAuditModel(BaseAuditModel):
         ('created', u'Дата'),
     ]
 
+    # TODO: переименовать type, чтобы не перекрывал стандартный объект type
     @classmethod
     def write(cls, user, role, permission_or_code=None, type=PERMISSION_ADDITION,
-               *args, **kwargs):
+              *args, **kwargs):
         u"""
         Непосредственная запись
 
@@ -265,7 +280,8 @@ class RolesAuditModel(BaseAuditModel):
         :param permission_or_code: разрешения
         :param type: действие (добавление, лишение, активация, отключение)
         """
-        audit = RolesAuditModel(); audit.by_user(user)
+        audit = RolesAuditModel()
+        audit.by_user(user)
         
         audit.type = type
         audit.role = role
@@ -274,6 +290,7 @@ class RolesAuditModel(BaseAuditModel):
     
     def get_role(self):
         return RolesAuditModel.objects.get(self.role_id)
+
     def set_role(self, role):
         self.role_id = role.id
         self.role_name = role.name
