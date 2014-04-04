@@ -1,13 +1,11 @@
 #coding:utf-8
 u"""
-m3_audit.models
----------------
+Основные модели аудита
+----------------------
 
-модели для подсистемы аудита
+.. Created on 17.12.2010
 
-Created on 17.12.2010
-
-@author: akvarats
+.. @author: akvarats
 """
 
 from django.db import models
@@ -120,7 +118,7 @@ class BaseModelChangeAuditModel(BaseAuditModel):
     @classmethod
     def write(cls, user, model_object, type, *args, **kwargs):
         u"""
-        Записывает изменения в моделях системы
+        Сохранение аудита
 
         :param user: пользоватьель
         :type user: :py:class:`django.contrib.auth.models.User`
@@ -220,7 +218,7 @@ class AuthAuditModel(BaseAuditModel):
     @classmethod
     def write(cls, user, type='login', *args, **kwargs):
         u"""
-        Пишем информацию об аудите входа/выхода
+        Сохранение аудита
 
         :param user: пользоватьель
         :type user: :py:class:`django.contrib.auth.models.User`
@@ -272,7 +270,7 @@ class RolesAuditModel(BaseAuditModel):
     def write(cls, user, role, permission_or_code=None, type=PERMISSION_ADDITION,
               *args, **kwargs):
         u"""
-        Непосредственная запись
+        Сохранение аудита
 
         :param user: пользоватьель
         :type user: :py:class:`django.contrib.auth.models.User`

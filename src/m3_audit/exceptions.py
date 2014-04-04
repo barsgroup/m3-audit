@@ -1,11 +1,11 @@
 #coding:utf-8
 u"""
-m3_audit.extensions
+Исключения системы
 -------------------
 
-Created on 22.12.2010
+.. Created on 22.12.2010
 
-@author: akvarats
+.. @author: akvarats
 """
 
 

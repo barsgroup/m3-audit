@@ -1,13 +1,11 @@
 #coding:utf-8
 u"""
-m3_audit.manager
-----------------
+Менеджер удита
+--------------
 
-Описание менеджера, который обслуживает систему аудита
+.. Created on 21.12.2010
 
-Created on 21.12.2010
-
-@author: akvarats
+.. @author: akvarats
 """
 
 from django.db import transaction
@@ -34,7 +32,7 @@ class AuditCache(RuntimeCache):
     
     
 class AuditManager(object):
-    u"""Менеджер, который проводит аудит приложений системы
+    u"""Менеджер, который проводит аудит приложений системы.
     Основной объект модуля аудит, передав необходимые параметры в метод :py:meth:`write`
     сохранится аудит по приложению
 

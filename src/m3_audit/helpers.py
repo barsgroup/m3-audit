@@ -1,10 +1,10 @@
 #coding: utf-8
 """
-m3_audit.helpers
-----------------
+Вспомогательные методы модуля
+-----------------------------
 
-Created on 29.10.11
-@author: ruldashev
+.. Created on 29.10.11
+.. @author: ruldashev
 """
 from django.db.models.base import ModelBase
 from django import forms as form_fields

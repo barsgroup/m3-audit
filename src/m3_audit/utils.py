@@ -1,11 +1,8 @@
 #coding:utf-8
 u"""
-m3_audit.utils
---------------
+.. Created on 07.01.2011
 
-Created on 07.01.2011
-
-@author: akvarats
+.. @author: akvarats
 """
 
 

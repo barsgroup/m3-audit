@@ -3,36 +3,18 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to m3-audit's documentation!
-====================================
+Добро пожаловать в документацию по *m3_audit*
+=============================================
 
-Contents:
+Содержание:
 
-.. automodule:: m3_audit
-    :members:
+.. toctree::
+    :maxdepth: 2
 
-.. automodule:: m3_audit.actions
-    :members:
-
-.. automodule:: m3_audit.exceptions
-    :members:
-
-.. automodule:: m3_audit.helpers
-    :members:
-
-.. automodule:: m3_audit.manager
-    :members:
-
-.. automodule:: m3_audit.models
-    :members:
-
-.. automodule:: m3_audit.ui
-    :members:
-
-.. automodule:: m3_audit.utils
-    :members:
-
-
+    base.rst
+    instalation.rst
+    usage.rst
+    contents.rst
 
 Indices and tables
 ==================

@@ -1,11 +1,11 @@
 #coding:utf-8
 u"""
-m3_audit.ui
------------
+Окна информации аудитов
+-----------------------
 
-Created on 06.01.2011
+.. Created on 06.01.2011
 
-@author: akvarats
+.. @author: akvarats
 """
 # TODO: можно же импортнуть в одну строчку все
 from m3.ui.ext import windows
