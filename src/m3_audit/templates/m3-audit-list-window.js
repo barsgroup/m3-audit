@@ -3,6 +3,11 @@ var form_details = Ext.getCmp('{{ component.form_details.client_id }}');
 var url_audit_win = '{{ component.url_audit_win }}';
 var url_audit_row = '{{ component.url_audit_row }}';
 
+/**
+ * Обработчик смены типа аудита
+ * @param e евент
+ */
+
 function rowChangeHandler(e){
     win.fireEvent('auditRowClick', grid_rows);
 
@@ -28,9 +33,15 @@ function rowChangeHandler(e){
     }
 }
 
+/**
+ * при смене аудита в комбо, закрывает текущее окно и
+ * открывает такое же, но с другим аудитом
+ * @param cml компонент
+ * @param record запись
+ * @param recId id записи
+ */
+
 function changeAuditHandler(cml, record, recId){
-    // при смене аудита в комбо, закрывает текущее окно и
-    // открывает такое же, но с другим аудитом
     assert(url_audit_win, 'Не задан url окна со списком аудита!');
 
     var audit = record.get('id');
