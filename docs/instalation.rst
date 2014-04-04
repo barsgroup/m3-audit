@@ -17,7 +17,7 @@
 Установка из архива
 -------------------
 
-Скачайте и распакуйте архив модуля https://bitbucket.org/barsgroup/m3-kladr/downloads
+Скачайте и распакуйте архив модуля https://bitbucket.org/barsgroup/m3_audit/downloads
 
 Установка из Mercurial
 ----------------------
@@ -26,7 +26,7 @@
 
 ::
 
-    hg clone https://bitbucket.org/barsgroup/m3-kladr
+    hg clone https://bitbucket.org/barsgroup/m3_audit
 
 Установка из каталога
 ---------------------
@@ -50,7 +50,7 @@
 
 ::
 
-    python manage.py migrate kladr
+    python manage.py migrate m3_audit
 
 В противном случае запустите команду:
 
