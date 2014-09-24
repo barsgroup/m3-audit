@@ -6,11 +6,11 @@ with open('src/requires.txt', 'r') as f:
     requires.extend(f.readlines())
 
 setup(name='m3-audit',
-      version='1.0.0',
-      url='https://src.bars-open.ru/py/m3/m3_contrib/m3_audit',
-      license='Apache License, Version 2.0',
+      version='2.0.1',
+      url='https://bitbucket.org/barsgroup/m3_audit',
+      license='MIT',
       author='BARS Group',
-      author_email='telepenin@bars-open.ru',
+      author_email='bars@bars-open.ru',
       description=u'Аудит операций в прикладной системе',
       package_dir={'': 'src'},
       packages=find_packages('src'),
@@ -23,5 +23,7 @@ setup(name='m3-audit',
         'Natural Language :: English',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
+        'License :: OSI Approved :: MIT License',
+        'Development Status :: 5 - Production/Stable',
       ],
       )
