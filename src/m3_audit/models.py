@@ -13,8 +13,6 @@ from django.core import serializers
 from django.contrib.auth.models import User, AnonymousUser
 
 from m3.db import BaseObjectModel
-# TODO: вроде нигде не используется в модуле
-from m3.core.json import json_encode
 from manager import AuditManager
 
 
