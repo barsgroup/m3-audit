@@ -7,11 +7,10 @@ u"""
 
 .. @author: akvarats
 """
+import logging
 
 from django.db import transaction
-# TODO: данная штука вроде как deprecated
-from m3.helpers import logger
-from m3.data.caching import RuntimeCache
+from m3.caching import RuntimeCache
 
 from exceptions import (DropM3AuditCacheException, 
                         NoWriteMethonInM3AuditException)
@@ -77,8 +76,8 @@ class AuditManager(object):
         :type default: str
         """
         return AuditCache().get(audit_name, default)
-    
-    @transaction.commit_on_success
+
+    @transaction.atomic
     def write(self, audit_name, user, *args, **kwargs):
         u"""
         Основной метод модуля аудит.
@@ -98,4 +97,4 @@ class AuditManager(object):
                 audit.write(user, *args, **kwargs)
             except:
                 # TODO: не помешало бы записать текст ошибки, для информативности
-                logger.exception(u'Не удалось записать результаты аудита \'%s\'' % audit_name)
+                logging.exception(u'Не удалось записать результаты аудита \'%s\'' % audit_name)

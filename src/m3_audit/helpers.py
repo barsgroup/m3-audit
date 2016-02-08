@@ -6,10 +6,12 @@
 .. Created on 29.10.11
 .. @author: ruldashev
 """
+from collections import OrderedDict
+
 from django.db.models.base import ModelBase
 from django import forms as form_fields
 # TODO: collections.OrderedDict не подойдет?
-from django.utils.datastructures import SortedDict
+from django.utils.datastructures import OrderedDict
 
 from m3.ui.ext import fields as ext_fields
 from m3.ui.ext.misc import store
@@ -52,9 +54,9 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None, formfield_c
             field_list.append((f.name, formfield))
         else:
             ignored.append(f.name)
-    field_dict = SortedDict(field_list)
+    field_dict = OrderedDict(field_list)
     if fields:
-        field_dict = SortedDict(
+        field_dict = OrderedDict(
             [(f, field_dict.get(f)) for f in fields
                 if ((not exclude) or (exclude and f not in exclude)) and (f not in ignored)]
         )
