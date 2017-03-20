@@ -1,15 +1,12 @@
-#coding:utf-8
-u"""
-Менеджер удита
---------------
+# coding: utf-8
 
-.. Created on 21.12.2010
 
-.. @author: akvarats
-"""
+u"""Менеджер аудита."""
+
+
 import logging
 
-from django.db import transaction
+from m3_django_compat import atomic
 from m3.caching import RuntimeCache
 
 from exceptions import (DropM3AuditCacheException, 
@@ -77,7 +74,7 @@ class AuditManager(object):
         """
         return AuditCache().get(audit_name, default)
 
-    @transaction.atomic
+    @atomic
     def write(self, audit_name, user, *args, **kwargs):
         u"""
         Основной метод модуля аудит.

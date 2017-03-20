@@ -1,4 +1,5 @@
-#coding: utf-8
+# coding: utf-8
+
 from setuptools import setup, find_packages
 
 requires = []
@@ -6,7 +7,7 @@ with open('src/requires.txt', 'r') as f:
     requires.extend(f.readlines())
 
 setup(name='m3-audit',
-      version='2.1.0',
+      version='2.1.1',
       url='https://bitbucket.org/barsgroup/m3_audit',
       license='MIT',
       author='BARS Group',
