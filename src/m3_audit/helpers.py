@@ -6,6 +6,7 @@
 .. Created on 29.10.11
 .. @author: ruldashev
 """
+from __future__ import absolute_import
 from collections import OrderedDict
 
 from django.db.models.base import ModelBase
@@ -86,7 +87,7 @@ def ext_fields_for_model(model, exclusion=[]):
     mapper[form_fields.DateTimeInput] = ext_fields.ExtDateField
     mapper[form_fields.Select] = ext_fields.ExtComboBox
 
-    fields = fields_for_model(model).items()
+    fields = list(fields_for_model(model).items())
     for key, field in fields:
         if key in exclusion:
             continue

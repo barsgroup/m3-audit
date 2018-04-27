@@ -8,12 +8,13 @@ u"""
 .. @author: akvarats
 """
 
+from __future__ import absolute_import
 from django.db import models
 from django.core import serializers
 from django.contrib.auth.models import User, AnonymousUser
 
 from m3.db import BaseObjectModel
-from manager import AuditManager
+from .manager import AuditManager
 
 
 class BaseAuditModel(BaseObjectModel):

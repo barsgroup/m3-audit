@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from django.conf.urls.defaults import *
 
 from m3.helpers import urls

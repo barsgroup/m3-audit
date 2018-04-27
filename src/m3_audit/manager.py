@@ -4,13 +4,14 @@
 u"""Менеджер аудита."""
 
 
+from __future__ import absolute_import
 import logging
 
 from m3_django_compat import atomic
 from m3.caching import RuntimeCache
 
-from exceptions import (DropM3AuditCacheException, 
-                        NoWriteMethonInM3AuditException)
+from .exceptions import (DropM3AuditCacheException,
+                         NoWriteMethonInM3AuditException)
 
 
 __all__ = ('AuditManager',)

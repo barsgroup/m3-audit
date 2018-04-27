@@ -1,4 +1,5 @@
 #!/usr/bin/python
+from __future__ import absolute_import
 import os, sys
 project_path = os.path.dirname(__file__)
 
@@ -10,7 +11,7 @@ sys.path.insert(0, os.path.join(project_path, '../env/m3/vendor'))
 from django.core.management import execute_manager
 
 try:
-    import settings # Assumed to be in the same directory.
+    from . import settings # Assumed to be in the same directory.
 except ImportError:
     import sys
     sys.stderr.write("Error: Can't find the file 'settings.py' in the directory containing %r. "
