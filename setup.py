@@ -1,13 +1,11 @@
 # coding: utf-8
 
+from __future__ import absolute_import
 from setuptools import setup, find_packages
 
-requires = []
-with open('src/requires.txt', 'r') as f:
-    requires.extend(f.readlines())
 
 setup(name='m3-audit',
-      version='2.1.1',
+      version='2.1.2',
       url='https://bitbucket.org/barsgroup/m3_audit',
       license='MIT',
       author='BARS Group',
@@ -15,7 +13,11 @@ setup(name='m3-audit',
       description=u'Аудит операций в прикладной системе',
       package_dir={'': 'src'},
       packages=find_packages('src'),
-      install_requires=requires,
+      install_requires=(
+          'm3-django-compat>=1.1.0',
+          'm3-ui',
+          'm3-core',
+      ),
       include_package_data=True,
       classifiers=[
         'Intended Audience :: Developers',

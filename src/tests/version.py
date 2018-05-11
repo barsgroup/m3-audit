@@ -1,5 +1,6 @@
 #coding:utf-8
 
+from __future__ import absolute_import
 import os
 
 project_path = os.path.dirname(__file__)

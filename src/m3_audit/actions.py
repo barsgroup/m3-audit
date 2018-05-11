@@ -10,14 +10,15 @@ u"""
 
 # TODO: пофиксить импорты экшенов, одно и тоже два раза импортируется
 
+from __future__ import absolute_import
 from datetime import datetime, time
 
 from m3.ui.actions import ActionPack, Action, utils, ControllerCache
 from m3.helpers import urls
 from m3.ui import actions
 
-import ui
-from manager import AuditManager
+from . import ui
+from .manager import AuditManager
 
 
 class BaseAuditUIActions(actions.ActionPack):

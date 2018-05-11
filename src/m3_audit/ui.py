@@ -8,6 +8,7 @@ u"""
 .. @author: akvarats
 """
 # TODO: можно же импортнуть в одну строчку все
+from __future__ import absolute_import
 from m3.ui.ext import windows
 from m3.ui.ext import panels
 from m3.ui.ext import containers
@@ -15,8 +16,7 @@ from m3.ui.ext import fields
 from m3.ui.ext.misc import store
 
 # TODO: не используется в модуле
-from manager import AuditManager
-from helpers import ext_fields_for_model
+from .helpers import ext_fields_for_model
 
 
 class AuditListWindow(windows.ExtWindow):
@@ -130,7 +130,7 @@ class DefaultEastPanel(panels.ExtPanel):
             list_fields = model.list_fields
         else:
             # в противном случае - все поля модели
-            list_fields = ext_fields.keys()
+            list_fields = list(ext_fields.keys())
 
         for field_name in list_fields:
             if field_name in ext_fields:
