@@ -68,15 +68,15 @@ class BaseAuditModel(BaseObjectModel):
         :param user: пользователь
         :type user: :py:class:`django.db.models.Models`
         """
-        # TODO: может лучше проверять user.is_anonymous()
-        if isinstance(user, User):
-            self.username = user.username
-            self.userid = user.id  
-            self.user_fio = (user.first_name + ' ' + user.last_name).strip()
-        elif isinstance(user, AnonymousUser):
+
+        if user.is_anonymous():
             self.username = 'anonymous'
             self.userid = 0
             self.user_fio = u'<Анонимный пользователь>'
+        else:
+            self.username = user.username
+            self.userid = user.id
+            self.user_fio = (user.first_name + ' ' + user.last_name).strip()
 
     
 class BaseModelChangeAuditModel(BaseAuditModel):
